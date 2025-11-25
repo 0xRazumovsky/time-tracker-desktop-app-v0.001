@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flowtime Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Manrope:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a1622;
+        --card: rgba(255, 255, 255, 0.07);
+        --muted: #adc8da;
+        --panel: rgba(255, 255, 255, 0.08);
+        --outline: rgba(255, 255, 255, 0.12);
+        --accent: #7dd3fc;
+        --accent-strong: #67e8f9;
+        --accent-soft: #b3f4ff;
+        --surface: rgba(20, 37, 51, 0.35);
+        --text: #e8f5ff;
+        --shadow: 0 20px 90px rgba(0, 0, 0, 0.28);
+        --blur: saturate(1.2) blur(14px);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", "Manrope", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 20% 20%, rgba(87, 202, 247, 0.22), transparent 35%),
+          radial-gradient(circle at 80% 0%, rgba(164, 179, 255, 0.24), transparent 32%),
+          radial-gradient(circle at 100% 80%, rgba(97, 235, 206, 0.22), transparent 35%),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .bg-fog {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(600px 600px at 30% 10%, rgba(173, 232, 255, 0.16), transparent 70%),
+          radial-gradient(600px 600px at 80% 30%, rgba(79, 209, 197, 0.16), transparent 70%),
+          radial-gradient(700px 700px at 50% 90%, rgba(124, 140, 255, 0.1), transparent 70%);
+        filter: var(--blur);
+      }
+
+      .app-shell {
+        position: relative;
+        width: 1180px;
+        max-width: 1180px;
+        margin: 24px auto 40px;
+        padding: 0 12px 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .glyph {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(124, 243, 255, 0.36), rgba(97, 179, 255, 0.24));
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        display: grid;
+        place-items: center;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 12px 40px rgba(0, 0, 0, 0.25);
+      }
+
+      .glyph span {
+        font-weight: 700;
+        color: #0a1f2f;
+        letter-spacing: 0.5px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.02em;
+      }
+
+      .chip {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .chip strong {
+        color: #dff6ff;
+      }
+
+      .top-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(10, 22, 34, 0.7);
+        backdrop-filter: var(--blur);
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 60px rgba(0, 0, 0, 0.3);
+        padding: 14px 16px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px;
+      }
+
+      .nav-row button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: var(--text);
+        cursor: pointer;
+        transition: border 120ms ease, transform 120ms ease, background 160ms ease;
+        white-space: nowrap;
+      }
+
+      .nav-row button.active {
+        background: rgba(125, 211, 252, 0.12);
+        border-color: rgba(125, 211, 252, 0.5);
+        box-shadow: 0 14px 40px rgba(103, 232, 249, 0.16);
+      }
+
+      .nav-row button:hover {
+        transform: translateY(-1px);
+      }
+
+      .nav-row .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--muted);
+        opacity: 0.8;
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .content-area {
+        display: grid;
+        gap: 14px;
+      }
+
+      .topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .grid.two {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items: start;
+        gap: 14px;
+      }
+
+      @media (max-width: 960px) {
+        .app-shell {
+          width: 100%;
+          max-width: 100%;
+        }
+        .grid.two {
+          grid-template-columns: 1fr;
+        }
+        .top-nav {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+      }
+
+      .swatch {
+        width: 26px;
+        height: 26px;
+        border-radius: 9px;
+        border: 2px solid rgba(255, 255, 255, 0.22);
+        cursor: pointer;
+        opacity: 0.8;
+        transition: transform 120ms ease, border 120ms ease, opacity 120ms ease;
+      }
+
+      .swatch.active {
+        transform: translateY(-1px);
+        border-color: #e8f5ff;
+        opacity: 1;
+      }
+
+      .color-chip {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--outline);
+        border-radius: 22px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        backdrop-filter: var(--blur);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        letter-spacing: -0.01em;
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .primary {
+        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        border: none;
+        color: #032031;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+        box-shadow: 0 12px 30px rgba(103, 232, 249, 0.24);
+      }
+
+      .primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .ghost {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: border 120ms ease, transform 120ms ease;
+      }
+
+      .ghost:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .timer-bar .time-readout {
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
+      .timer-bar .time-readout span {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .progress {
+        position: relative;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+      }
+
+      .progress .fill {
+        height: 100%;
+        background: linear-gradient(90deg, rgba(125, 211, 252, 0.8), rgba(103, 232, 249, 1));
+        border-radius: 999px;
+        transition: width 220ms ease;
+      }
+
+      .timer-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .pill strong {
+        color: #dff6ff;
+      }
+
+      .timer-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .task-list form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .input {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .input:focus {
+        outline: 2px solid rgba(103, 232, 249, 0.4);
+        border-color: rgba(103, 232, 249, 0.4);
+      }
+
+      .task-items {
+        margin: 14px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .task {
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        transition: border 120ms ease, transform 120ms ease;
+      }
+
+      .task.active {
+        border-color: rgba(103, 232, 249, 0.7);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(103, 232, 249, 0.15);
+      }
+
+      .task h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .task .meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .tag {
+        padding: 4px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .time-small {
+        font-weight: 600;
+        color: #e1f7ff;
+      }
+
+      .reports .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+      }
+
+      .stat {
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .stat .value {
+        display: block;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .stat .label {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .report-list {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .report-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .report-row .title {
+        font-weight: 600;
+      }
+
+      .tiny {
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-fog" aria-hidden="true"></div>
+    <div id="root" class="app-shell"></div>
+
+    <script type="module">
+      import React, { useEffect, useMemo, useState } from "https://esm.sh/react@19.2.0";
+      import { createRoot } from "https://esm.sh/react-dom@19.2.0/client";
+      import TaskList from "./components/TaskList.js";
+      import TimerBar from "./components/TimerBar.js";
+      import Reports from "./components/Reports.js";
+
+      const h = React.createElement;
+
+      const navItems = [
+        { id: "time", label: "Time tracking" },
+        { id: "tasks", label: "Tasks" },
+        { id: "analytics", label: "Analytics" },
+        { id: "settings", label: "Settings" },
+        { id: "premium", label: "Premium" },
+        { id: "help", label: "Help" },
+      ];
+
+      const starterTasks = [
+        { id: "t-1", title: "Deep work: journey map", tag: "Product", color: "#67e8f9", seconds: 32 * 60, status: "Active" },
+        { id: "t-2", title: "Inbox triage + replies", tag: "Admin", color: "#a5b4fc", seconds: 14 * 60, status: "In queue" },
+        { id: "t-3", title: "Prototype: timer bar", tag: "Build", color: "#34d399", seconds: 8 * 60, status: "In queue" },
+      ];
+
+      const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      };
+
+      function App() {
+        const [tasks, setTasks] = useState(starterTasks);
+        const [activeTaskId, setActiveTaskId] = useState(starterTasks[0].id);
+        const [isRunning, setIsRunning] = useState(false);
+        const [elapsedSeconds, setElapsedSeconds] = useState(starterTasks[0].seconds);
+        const [activeTab, setActiveTab] = useState("time");
+
+        useEffect(() => {
+          if (!isRunning || !activeTaskId) return undefined;
+          const tick = setInterval(() => {
+            setElapsedSeconds((prev) => prev + 1);
+            setTasks((prev) =>
+              prev.map((task) =>
+                task.id === activeTaskId ? { ...task, seconds: (task.seconds || 0) + 1 } : task,
+              ),
+            );
+          }, 1000);
+          return () => clearInterval(tick);
+        }, [isRunning, activeTaskId]);
+
+        useEffect(() => {
+          const activeTask = tasks.find((task) => task.id === activeTaskId);
+          setElapsedSeconds(activeTask?.seconds || 0);
+        }, [activeTaskId]);
+
+        const activeTask = useMemo(
+          () => tasks.find((task) => task.id === activeTaskId),
+          [tasks, activeTaskId],
+        );
+
+        const handleStart = () => {
+          if (!activeTaskId) return;
+          setIsRunning(true);
+        };
+
+        const handlePause = () => setIsRunning(false);
+
+        const handleReset = () => {
+          if (!activeTaskId) return;
+          setTasks((prev) =>
+            prev.map((task) => (task.id === activeTaskId ? { ...task, seconds: 0 } : task)),
+          );
+          setElapsedSeconds(0);
+          setIsRunning(false);
+        };
+
+        const handleAddTask = (title, tag, color) => {
+          const newTask = {
+            id: `t-${Date.now()}`,
+            title,
+            tag: tag || "Focus",
+            seconds: 0,
+            status: "In queue",
+            color: color || "#67e8f9",
+          };
+          setTasks((prev) => [...prev, newTask]);
+          setActiveTaskId(newTask.id);
+          setElapsedSeconds(0);
+          setIsRunning(false);
+        };
+
+        const handleSelectTask = (id) => {
+          setActiveTaskId(id);
+          setIsRunning(false);
+        };
+
+        const handleEditTask = (id, updates) => {
+          setTasks((prev) =>
+            prev.map((task) => (task.id === id ? { ...task, ...updates } : task)),
+          );
+          if (activeTaskId === id) {
+            setIsRunning(false);
+          }
+        };
+
+        const totals = useMemo(() => {
+          const totalSeconds = tasks.reduce((sum, task) => sum + (task.seconds || 0), 0);
+          const longest = tasks.reduce(
+            (winner, task) => (task.seconds > (winner?.seconds || 0) ? task : winner),
+            undefined,
+          );
+          return { totalSeconds, longest };
+        }, [tasks]);
+
+        const quickQueue = tasks.slice(0, 4);
+
+        const renderContent = () => {
+          if (activeTab === "tasks") {
+            return [
+              h("div", { className: "grid two" }, [
+                h(TaskList, {
+                  tasks,
+                  activeTaskId,
+                  onAddTask: handleAddTask,
+                  onSelectTask: handleSelectTask,
+                  onStartTask: () => setIsRunning(true),
+                  formatTime,
+                  isRunning,
+                  onEditTask: handleEditTask,
+                }),
+                h(Reports, { tasks, formatTime }),
+              ]),
+            ];
+          }
+
+          if (activeTab === "analytics") {
+            return [h(Reports, { tasks, formatTime })];
+          }
+
+          if (activeTab === "settings") {
+            return [
+              h("div", { className: "panel" }, [
+                h("h2", null, "Settings"),
+                h("p", { className: "muted" }, "Configure notifications, themes, and integrations here."),
+              ]),
+            ];
+          }
+
+          if (activeTab === "premium") {
+            return [
+              h("div", { className: "panel" }, [
+                h("h2", null, "Premium"),
+                h("p", { className: "muted" }, "Upgrade for deeper analytics, unlimited history, and pro exports."),
+              ]),
+            ];
+          }
+
+          if (activeTab === "help") {
+            return [
+              h("div", { className: "panel" }, [
+                h("h2", null, "Help"),
+                h("p", { className: "muted" }, "Need support? Reach out or check the quickstart guide."),
+              ]),
+            ];
+          }
+
+          return [
+            h(TimerBar, {
+              activeTask,
+              elapsedSeconds,
+              isRunning,
+              formatTime,
+              onStart: handleStart,
+              onPause: handlePause,
+              onReset: handleReset,
+            }),
+            h(
+              "div",
+              { className: "panel" },
+              [
+                h("h2", null, "Queue"),
+                h("p", { className: "muted" }, "Next up sessions to jump into quickly."),
+                h(
+                  "div",
+                  { className: "task-items" },
+                  quickQueue.map((task) =>
+                    h(
+                      "div",
+                        {
+                          key: task.id,
+                          className: `task ${task.id === activeTaskId ? "active" : ""}`,
+                          onClick: () => {
+                            handleSelectTask(task.id);
+                            setIsRunning(true);
+                          },
+                          style: { cursor: "pointer" },
+                        },
+                        [
+                          h("div", null, [
+                            h("h3", null, task.title),
+                            h("div", { className: "meta" }, [
+                              h("span", {
+                                className: "tag",
+                                style: { borderColor: task.color, background: `${task.color}22` },
+                              }, task.tag || "Focus"),
+                              h("span", { className: "time-small" }, formatTime(task.seconds || 0)),
+                            ]),
+                          ]),
+                          h(
+                            "button",
+                            {
+                              className: "ghost",
+                              onClick: (event) => {
+                                event.stopPropagation();
+                                handleSelectTask(task.id);
+                                setIsRunning(true);
+                              },
+                            },
+                            "Focus",
+                          ),
+                        ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ];
+        };
+
+        return h("div", { className: "app-shell" }, [
+          h("header", { className: "top-nav" }, [
+            h("div", { className: "brand" }, [
+              h("div", { className: "glyph" }, [h("span", null, "ft")]), // brand logo spot
+              h("div", null, [
+                h("h1", null, "Flowtime"), // brand name spot
+                h("p", { className: "muted" }, "Track, plan, reflect."),
+              ]),
+            ]),
+            h(
+              "div",
+              { className: "nav-row" },
+              navItems.map((item) =>
+                h(
+                  "button",
+                  {
+                    key: item.id,
+                    className: item.id === activeTab ? "active" : "",
+                    onClick: () => {
+                      setActiveTab(item.id);
+                      setIsRunning(false);
+                    },
+                  },
+                  [
+                    h("span", { className: "dot" }),
+                    h("span", null, item.label),
+                  ],
+                ),
+              ),
+            ),
+          ]),
+          h("div", { className: "content-area" }, [
+            h("div", { className: "topline" }, [
+              h("div", { className: "identity" }, [
+                h("div", { className: "pill" }, [activeTab === "time" ? "Time tracking" : activeTab === "tasks" ? "Tasks" : "Analytics"]),
+                h("div", { className: "chip" }, [
+                  "Active task",
+                  h("strong", null, activeTask ? activeTask.title : "None"),
+                ]),
+              ]),
+              h("div", { className: "chip" }, ["Focus bank", h("strong", null, `${Math.round(totals.totalSeconds / 60)}m`)]),
+            ]),
+            ...renderContent(),
+          ]),
+        ]);
+      }
+
+      const root = createRoot(document.getElementById("root"));
+      root.render(h(App));
+    </script>
+  </body>
+</html>

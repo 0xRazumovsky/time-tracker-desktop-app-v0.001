@@ -1,17 +1,20 @@
 import { app, BrowserWindow } from "electron/main";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const path = "node:path";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  win.loadFile("index.html");
+  win.loadFile(path.join(__dirname, "../index.html"));
 }
 
 app.whenReady().then(() => {
