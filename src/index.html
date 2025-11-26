@@ -493,10 +493,11 @@
         { id: "help", label: "Help" },
       ];
 
+      const now = Date.now();
       const starterTasks = [
-        { id: "t-1", title: "Deep work: journey map", tag: "Product", color: "#67e8f9", seconds: 32 * 60, status: "Active" },
-        { id: "t-2", title: "Inbox triage + replies", tag: "Admin", color: "#a5b4fc", seconds: 14 * 60, status: "In queue" },
-        { id: "t-3", title: "Prototype: timer bar", tag: "Build", color: "#34d399", seconds: 8 * 60, status: "In queue" },
+        { id: "t-1", title: "Deep work: journey map", tag: "Product", color: "#67e8f9", seconds: 32 * 60, status: "Active", startedAt: now - 2 * 24 * 60 * 60 * 1000 },
+        { id: "t-2", title: "Inbox triage + replies", tag: "Admin", color: "#a5b4fc", seconds: 14 * 60, status: "In queue", startedAt: now - 6 * 24 * 60 * 60 * 1000 },
+        { id: "t-3", title: "Prototype: timer bar", tag: "Build", color: "#34d399", seconds: 8 * 60, status: "In queue", startedAt: now - 20 * 24 * 60 * 60 * 1000 },
       ];
 
       const formatTime = (seconds) => {
@@ -511,6 +512,7 @@
         const [isRunning, setIsRunning] = useState(false);
         const [elapsedSeconds, setElapsedSeconds] = useState(starterTasks[0].seconds);
         const [activeTab, setActiveTab] = useState("time");
+        const [analyticsRange, setAnalyticsRange] = useState("7d");
 
         useEffect(() => {
           if (!isRunning || !activeTaskId) return undefined;
@@ -559,6 +561,7 @@
             seconds: 0,
             status: "In queue",
             color: color || "#67e8f9",
+            startedAt: Date.now(),
           };
           setTasks((prev) => [...prev, newTask]);
           setActiveTaskId(newTask.id);
@@ -580,6 +583,8 @@
           }
         };
 
+        const activeTabLabel = navItems.find((item) => item.id === activeTab)?.label || "";
+
         const totals = useMemo(() => {
           const totalSeconds = tasks.reduce((sum, task) => sum + (task.seconds || 0), 0);
           const longest = tasks.reduce(
@@ -595,23 +600,23 @@
           if (activeTab === "tasks") {
             return [
               h("div", { className: "grid two" }, [
-                h(TaskList, {
-                  tasks,
-                  activeTaskId,
-                  onAddTask: handleAddTask,
-                  onSelectTask: handleSelectTask,
-                  onStartTask: () => setIsRunning(true),
-                  formatTime,
-                  isRunning,
-                  onEditTask: handleEditTask,
-                }),
-                h(Reports, { tasks, formatTime }),
-              ]),
-            ];
-          }
+              h(TaskList, {
+                tasks,
+                activeTaskId,
+                onAddTask: handleAddTask,
+                onSelectTask: handleSelectTask,
+                onStartTask: () => setIsRunning(true),
+                formatTime,
+                isRunning,
+                onEditTask: handleEditTask,
+              }),
+              h(Reports, { tasks, formatTime, activeRange: analyticsRange, onRangeChange: setAnalyticsRange }),
+            ]),
+          ];
+        }
 
           if (activeTab === "analytics") {
-            return [h(Reports, { tasks, formatTime })];
+            return [h(Reports, { tasks, formatTime, activeRange: analyticsRange, onRangeChange: setAnalyticsRange })];
           }
 
           if (activeTab === "settings") {
@@ -663,39 +668,39 @@
                   quickQueue.map((task) =>
                     h(
                       "div",
-                        {
-                          key: task.id,
-                          className: `task ${task.id === activeTaskId ? "active" : ""}`,
-                          onClick: () => {
-                            handleSelectTask(task.id);
-                            setIsRunning(true);
-                          },
-                          style: { cursor: "pointer" },
+                      {
+                        key: task.id,
+                        className: `task ${task.id === activeTaskId ? "active" : ""}`,
+                        onClick: () => {
+                          handleSelectTask(task.id);
+                          setIsRunning(true);
                         },
-                        [
-                          h("div", null, [
-                            h("h3", null, task.title),
-                            h("div", { className: "meta" }, [
-                              h("span", {
-                                className: "tag",
-                                style: { borderColor: task.color, background: `${task.color}22` },
-                              }, task.tag || "Focus"),
-                              h("span", { className: "time-small" }, formatTime(task.seconds || 0)),
-                            ]),
+                        style: { cursor: "pointer" },
+                      },
+                      [
+                        h("div", null, [
+                          h("h3", null, task.title),
+                          h("div", { className: "meta" }, [
+                            h("span", {
+                              className: "tag",
+                              style: { borderColor: task.color, background: `${task.color}22` },
+                            }, task.tag || "Focus"),
+                            h("span", { className: "time-small" }, formatTime(task.seconds || 0)),
                           ]),
-                          h(
-                            "button",
-                            {
-                              className: "ghost",
-                              onClick: (event) => {
-                                event.stopPropagation();
-                                handleSelectTask(task.id);
-                                setIsRunning(true);
-                              },
+                        ]),
+                        h(
+                          "button",
+                          {
+                            className: "ghost",
+                            onClick: (event) => {
+                              event.stopPropagation();
+                              handleSelectTask(task.id);
+                              setIsRunning(true);
                             },
-                            "Focus",
-                          ),
-                        ],
+                          },
+                          "Focus",
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -738,7 +743,7 @@
           h("div", { className: "content-area" }, [
             h("div", { className: "topline" }, [
               h("div", { className: "identity" }, [
-                h("div", { className: "pill" }, [activeTab === "time" ? "Time tracking" : activeTab === "tasks" ? "Tasks" : "Analytics"]),
+                h("div", { className: "pill" }, [activeTabLabel || ""]),
                 h("div", { className: "chip" }, [
                   "Active task",
                   h("strong", null, activeTask ? activeTask.title : "None"),
