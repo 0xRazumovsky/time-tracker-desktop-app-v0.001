@@ -12,11 +12,18 @@ import {
 } from "./db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isPackaged = app.isPackaged;
 const dbPromise = initDatabase();
 let tray;
 let isTimerRunning = false;
 let lastStart = null;
 let activeTaskId = null;
+
+function assetPath(filename) {
+  return isPackaged
+    ? path.join(process.resourcesPath, filename)
+    : path.join(__dirname, "..", "..", filename);
+}
 
 function updateTrayMenu() {
   if (!tray) return;
@@ -39,7 +46,7 @@ function updateTrayMenu() {
 }
 
 function createTray() {
-  const iconPath = path.join(__dirname, "../../32x32.png");
+  const iconPath = assetPath("32x32.png");
   const image = nativeImage.createFromPath(iconPath);
   tray = new Tray(image);
   tray.setToolTip("Flowtime");
@@ -51,7 +58,7 @@ function createWindow() {
     width: 800,
     height: 600,
     resizable: false,
-    icon: path.join(__dirname, "../../512x512.png"),
+    icon: assetPath("512x512.png"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
