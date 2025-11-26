@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -33,10 +33,23 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Space Grotesk", "Manrope", system-ui, -apple-system, sans-serif;
-        background: radial-gradient(circle at 20% 20%, rgba(87, 202, 247, 0.22), transparent 35%),
-          radial-gradient(circle at 80% 0%, rgba(164, 179, 255, 0.24), transparent 32%),
-          radial-gradient(circle at 100% 80%, rgba(97, 235, 206, 0.22), transparent 35%),
+        font-family: "Space Grotesk", "Manrope", system-ui, -apple-system,
+          sans-serif;
+        background: radial-gradient(
+            circle at 20% 20%,
+            rgba(87, 202, 247, 0.22),
+            transparent 35%
+          ),
+          radial-gradient(
+            circle at 80% 0%,
+            rgba(164, 179, 255, 0.24),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at 100% 80%,
+            rgba(97, 235, 206, 0.22),
+            transparent 35%
+          ),
           var(--bg);
         color: var(--text);
       }
@@ -45,9 +58,21 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        background: radial-gradient(600px 600px at 30% 10%, rgba(173, 232, 255, 0.16), transparent 70%),
-          radial-gradient(600px 600px at 80% 30%, rgba(79, 209, 197, 0.16), transparent 70%),
-          radial-gradient(700px 700px at 50% 90%, rgba(124, 140, 255, 0.1), transparent 70%);
+        background: radial-gradient(
+            600px 600px at 30% 10%,
+            rgba(173, 232, 255, 0.16),
+            transparent 70%
+          ),
+          radial-gradient(
+            600px 600px at 80% 30%,
+            rgba(79, 209, 197, 0.16),
+            transparent 70%
+          ),
+          radial-gradient(
+            700px 700px at 50% 90%,
+            rgba(124, 140, 255, 0.1),
+            transparent 70%
+          );
         filter: var(--blur);
       }
 
@@ -71,11 +96,16 @@
         width: 44px;
         height: 44px;
         border-radius: 16px;
-        background: linear-gradient(135deg, rgba(124, 243, 255, 0.36), rgba(97, 179, 255, 0.24));
+        background: linear-gradient(
+          135deg,
+          rgba(124, 243, 255, 0.36),
+          rgba(97, 179, 255, 0.24)
+        );
         border: 1px solid rgba(255, 255, 255, 0.22);
         display: grid;
         place-items: center;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 12px 40px rgba(0, 0, 0, 0.25);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          0 12px 40px rgba(0, 0, 0, 0.25);
       }
 
       .glyph span {
@@ -140,7 +170,8 @@
         border-radius: 12px;
         color: var(--text);
         cursor: pointer;
-        transition: border 120ms ease, transform 120ms ease, background 160ms ease;
+        transition: border 120ms ease, transform 120ms ease,
+          background 160ms ease;
         white-space: nowrap;
       }
 
@@ -252,7 +283,11 @@
       }
 
       .primary {
-        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        background: linear-gradient(
+          120deg,
+          var(--accent),
+          var(--accent-strong)
+        );
         border: none;
         color: #032031;
         padding: 10px 16px;
@@ -313,7 +348,11 @@
 
       .progress .fill {
         height: 100%;
-        background: linear-gradient(90deg, rgba(125, 211, 252, 0.8), rgba(103, 232, 249, 1));
+        background: linear-gradient(
+          90deg,
+          rgba(125, 211, 252, 0.8),
+          rgba(103, 232, 249, 1)
+        );
         border-radius: 999px;
         transition: width 220ms ease;
       }
@@ -476,7 +515,11 @@
     <div id="root" class="app-shell"></div>
 
     <script type="module">
-      import React, { useEffect, useMemo, useState } from "https://esm.sh/react@19.2.0";
+      import React, {
+        useEffect,
+        useMemo,
+        useState,
+      } from "https://esm.sh/react@19.2.0";
       import { createRoot } from "https://esm.sh/react-dom@19.2.0/client";
       import TaskList from "./components/TaskList.js";
       import TimerBar from "./components/TimerBar.js";
@@ -488,40 +531,132 @@
         { id: "time", label: "Time tracking" },
         { id: "tasks", label: "Tasks" },
         { id: "analytics", label: "Analytics" },
-        { id: "settings", label: "Settings" },
-        { id: "premium", label: "Premium" },
-        { id: "help", label: "Help" },
+        //{ id: "settings", label: "Settings" },
+        //{ id: "premium", label: "Premium" },
+        //{ id: "help", label: "Help" },
       ];
 
       const now = Date.now();
       const starterTasks = [
-        { id: "t-1", title: "Deep work: journey map", tag: "Product", color: "#67e8f9", seconds: 32 * 60, status: "Active", startedAt: now - 2 * 24 * 60 * 60 * 1000 },
-        { id: "t-2", title: "Inbox triage + replies", tag: "Admin", color: "#a5b4fc", seconds: 14 * 60, status: "In queue", startedAt: now - 6 * 24 * 60 * 60 * 1000 },
-        { id: "t-3", title: "Prototype: timer bar", tag: "Build", color: "#34d399", seconds: 8 * 60, status: "In queue", startedAt: now - 20 * 24 * 60 * 60 * 1000 },
+        {
+          id: "t-1",
+          title: "Deep work: journey map",
+          tag: "Product",
+          color: "#67e8f9",
+          seconds: 32 * 60,
+          status: "Active",
+          startedAt: now - 2 * 24 * 60 * 60 * 1000,
+        },
+        {
+          id: "t-2",
+          title: "Inbox triage + replies",
+          tag: "Admin",
+          color: "#a5b4fc",
+          seconds: 14 * 60,
+          status: "In queue",
+          startedAt: now - 6 * 24 * 60 * 60 * 1000,
+        },
+        {
+          id: "t-3",
+          title: "Prototype: timer bar",
+          tag: "Build",
+          color: "#34d399",
+          seconds: 8 * 60,
+          status: "In queue",
+          startedAt: now - 20 * 24 * 60 * 60 * 1000,
+        },
       ];
 
       const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(
+          2,
+          "0"
+        )}`;
       };
 
       function App() {
-        const [tasks, setTasks] = useState(starterTasks);
-        const [activeTaskId, setActiveTaskId] = useState(starterTasks[0].id);
+        const [tasks, setTasks] = useState([]);
+        const [sessions, setSessions] = useState([]);
+        const [activeTaskId, setActiveTaskId] = useState(null);
         const [isRunning, setIsRunning] = useState(false);
-        const [elapsedSeconds, setElapsedSeconds] = useState(starterTasks[0].seconds);
+        const [elapsedSeconds, setElapsedSeconds] = useState(0);
         const [activeTab, setActiveTab] = useState("time");
         const [analyticsRange, setAnalyticsRange] = useState("7d");
+        const [pendingSeconds, setPendingSeconds] = useState(0);
+        const pendingRef = React.useRef(0);
+        const trayUnsubRef = React.useRef(null);
+
+        const sendTimerState = (running) => {
+          window.controls?.sendTimerState?.({
+            running,
+            taskId: activeTaskId,
+            lastTick: Date.now(),
+          });
+        };
+
+        useEffect(() => {
+          let mounted = true;
+          (async () => {
+            try {
+              const stored = await window.api?.loadState?.();
+              if (mounted && stored?.tasks?.length) {
+                const normalizedTasks = stored.tasks.map((task) => ({
+                  ...task,
+                  startedAt: task.started_at ?? task.startedAt,
+                  createdAt: task.created_at ?? task.createdAt,
+                  updatedAt: task.updated_at ?? task.updatedAt,
+                }));
+                setTasks(normalizedTasks);
+                setSessions(stored.sessions || []);
+                setActiveTaskId(normalizedTasks[0].id);
+                setElapsedSeconds(normalizedTasks[0].seconds || 0);
+                return;
+              }
+            } catch (error) {
+              console.error("Failed to load state, using defaults", error);
+            }
+            if (mounted) {
+              setTasks(starterTasks);
+              setSessions([]);
+              setActiveTaskId(starterTasks[0].id);
+              setElapsedSeconds(starterTasks[0].seconds);
+              try {
+                await Promise.all(
+                  starterTasks.map((task) =>
+                    window.api?.saveTask?.({
+                      ...task,
+                      createdAt: task.startedAt || Date.now(),
+                    })
+                  )
+                );
+              } catch (error) {
+                console.error("Failed to seed starter tasks", error);
+              }
+            }
+          })();
+          return () => {
+            mounted = false;
+          };
+        }, []);
 
         useEffect(() => {
           if (!isRunning || !activeTaskId) return undefined;
           const tick = setInterval(() => {
             setElapsedSeconds((prev) => prev + 1);
+            setPendingSeconds((prev) => {
+              const next = prev + 1;
+              pendingRef.current = next;
+              return next;
+            });
+            sendTimerState(true);
             setTasks((prev) =>
               prev.map((task) =>
-                task.id === activeTaskId ? { ...task, seconds: (task.seconds || 0) + 1 } : task,
-              ),
+                task.id === activeTaskId
+                  ? { ...task, seconds: (task.seconds || 0) + 1 }
+                  : task
+              )
             );
           }, 1000);
           return () => clearInterval(tick);
@@ -530,100 +665,230 @@
         useEffect(() => {
           const activeTask = tasks.find((task) => task.id === activeTaskId);
           setElapsedSeconds(activeTask?.seconds || 0);
-        }, [activeTaskId]);
+          setPendingSeconds(0);
+          pendingRef.current = 0;
+          sendTimerState(isRunning);
+        }, [activeTaskId, tasks]);
 
         const activeTask = useMemo(
           () => tasks.find((task) => task.id === activeTaskId),
-          [tasks, activeTaskId],
+          [tasks, activeTaskId]
         );
+
+        const flushActive = async () => {
+          if (!activeTaskId || pendingRef.current <= 0) return;
+          const delta = pendingRef.current;
+          pendingRef.current = 0;
+          setPendingSeconds(0);
+          const timestamp = Date.now();
+          const day = new Date(timestamp).setHours(0, 0, 0, 0);
+          setSessions((prev) => {
+            const existing = prev.find(
+              (entry) => entry.taskId === activeTaskId && entry.day === day
+            );
+            if (existing) {
+              return prev.map((entry) =>
+                entry.taskId === activeTaskId && entry.day === day
+                  ? { ...entry, seconds: entry.seconds + delta }
+                  : entry
+              );
+            }
+            return [...prev, { taskId: activeTaskId, day, seconds: delta }];
+          });
+          try {
+            await window.api?.logSession?.({
+              taskId: activeTaskId,
+              seconds: delta,
+              timestamp,
+            });
+          } catch (error) {
+            console.error("Failed to persist session", error);
+          }
+        };
 
         const handleStart = () => {
           if (!activeTaskId) return;
           setIsRunning(true);
+          sendTimerState(true);
         };
 
-        const handlePause = () => setIsRunning(false);
+        const handlePause = async () => {
+          await flushActive();
+          setIsRunning(false);
+          sendTimerState(false);
+        };
 
-        const handleReset = () => {
+        const handleReset = async () => {
           if (!activeTaskId) return;
+          pendingRef.current = 0;
+          setPendingSeconds(0);
           setTasks((prev) =>
-            prev.map((task) => (task.id === activeTaskId ? { ...task, seconds: 0 } : task)),
+            prev.map((task) =>
+              task.id === activeTaskId ? { ...task, seconds: 0 } : task
+            )
+          );
+          setSessions((prev) =>
+            prev.filter((session) => session.taskId !== activeTaskId)
           );
           setElapsedSeconds(0);
           setIsRunning(false);
+          try {
+            await window.api?.resetTaskSeconds?.(activeTaskId);
+          } catch (error) {
+            console.error("Failed to reset task", error);
+          }
         };
 
-        const handleAddTask = (title, tag, color) => {
+        const handleAddTask = async (title, tag, color) => {
+          const nowTs = Date.now();
           const newTask = {
-            id: `t-${Date.now()}`,
+            id: `t-${nowTs}`,
             title,
             tag: tag || "Focus",
             seconds: 0,
             status: "In queue",
             color: color || "#67e8f9",
-            startedAt: Date.now(),
+            startedAt: nowTs,
+            createdAt: nowTs,
           };
           setTasks((prev) => [...prev, newTask]);
           setActiveTaskId(newTask.id);
           setElapsedSeconds(0);
           setIsRunning(false);
+          try {
+            await window.api?.saveTask?.(newTask);
+          } catch (error) {
+            console.error("Failed to save new task", error);
+          }
         };
 
-        const handleSelectTask = (id) => {
+        const handleSelectTask = async (id) => {
+          await flushActive();
           setActiveTaskId(id);
           setIsRunning(false);
         };
 
-        const handleEditTask = (id, updates) => {
+        const handleEditTask = async (id, updates) => {
           setTasks((prev) =>
-            prev.map((task) => (task.id === id ? { ...task, ...updates } : task)),
+            prev.map((task) =>
+              task.id === id ? { ...task, ...updates } : task
+            )
           );
           if (activeTaskId === id) {
             setIsRunning(false);
+            sendTimerState(false);
+          }
+          try {
+            await window.api?.updateTask?.({ id, updates });
+          } catch (error) {
+            console.error("Failed to update task", error);
           }
         };
 
-        const activeTabLabel = navItems.find((item) => item.id === activeTab)?.label || "";
+        const handleDeleteTask = async (id) => {
+          await flushActive();
+          setTasks((prev) => prev.filter((task) => task.id !== id));
+          setSessions((prev) => prev.filter((entry) => entry.taskId !== id));
+          if (activeTaskId === id) {
+            const next = tasks.find((task) => task.id !== id);
+            setActiveTaskId(next?.id || null);
+            setElapsedSeconds(next?.seconds || 0);
+            setIsRunning(false);
+            sendTimerState(false);
+          }
+          try {
+            await window.api?.deleteTask?.(id);
+          } catch (error) {
+            console.error("Failed to delete task", error);
+          }
+        };
+
+        const activeTabLabel =
+          navItems.find((item) => item.id === activeTab)?.label || "";
 
         const totals = useMemo(() => {
-          const totalSeconds = tasks.reduce((sum, task) => sum + (task.seconds || 0), 0);
+          const totalSeconds = tasks.reduce(
+            (sum, task) => sum + (task.seconds || 0),
+            0
+          );
           const longest = tasks.reduce(
-            (winner, task) => (task.seconds > (winner?.seconds || 0) ? task : winner),
-            undefined,
+            (winner, task) =>
+              task.seconds > (winner?.seconds || 0) ? task : winner,
+            undefined
           );
           return { totalSeconds, longest };
         }, [tasks]);
 
         const quickQueue = tasks.slice(0, 4);
 
+        useEffect(() => {
+          if (!window.controls?.onTrayToggle) return undefined;
+          if (trayUnsubRef.current) {
+            trayUnsubRef.current();
+          }
+          const unsub = window.controls.onTrayToggle(() => {
+            if (isRunning) {
+              handlePause();
+            } else {
+              handleStart();
+            }
+          });
+          trayUnsubRef.current = unsub;
+          return () => {
+            if (trayUnsubRef.current) {
+              trayUnsubRef.current();
+              trayUnsubRef.current = null;
+            }
+          };
+        }, [isRunning, activeTaskId]);
+
         const renderContent = () => {
           if (activeTab === "tasks") {
             return [
               h("div", { className: "grid two" }, [
-              h(TaskList, {
-                tasks,
-                activeTaskId,
-                onAddTask: handleAddTask,
-                onSelectTask: handleSelectTask,
-                onStartTask: () => setIsRunning(true),
-                formatTime,
-                isRunning,
-                onEditTask: handleEditTask,
-              }),
-              h(Reports, { tasks, formatTime, activeRange: analyticsRange, onRangeChange: setAnalyticsRange }),
-            ]),
-          ];
-        }
+                h(TaskList, {
+                  tasks,
+                  activeTaskId,
+                  onAddTask: handleAddTask,
+                  onSelectTask: handleSelectTask,
+                  onStartTask: () => setIsRunning(true),
+                  formatTime,
+                  isRunning,
+                  onEditTask: handleEditTask,
+                  onDeleteTask: handleDeleteTask,
+                }),
+                h(Reports, {
+                  tasks,
+                  formatTime,
+                  activeRange: analyticsRange,
+                  onRangeChange: setAnalyticsRange,
+                  sessions,
+                }),
+              ]),
+            ];
+          }
 
           if (activeTab === "analytics") {
-            return [h(Reports, { tasks, formatTime, activeRange: analyticsRange, onRangeChange: setAnalyticsRange })];
+            return [
+              h(Reports, {
+                tasks,
+                formatTime,
+                activeRange: analyticsRange,
+                onRangeChange: setAnalyticsRange,
+                sessions,
+              }),
+            ];
           }
 
           if (activeTab === "settings") {
             return [
               h("div", { className: "panel" }, [
                 h("h2", null, "Settings"),
-                h("p", { className: "muted" }, "Configure notifications, themes, and integrations here."),
+                h(
+                  "p",
+                  { className: "muted" },
+                  "Configure notifications, themes, and integrations here."
+                ),
               ]),
             ];
           }
@@ -632,7 +897,11 @@
             return [
               h("div", { className: "panel" }, [
                 h("h2", null, "Premium"),
-                h("p", { className: "muted" }, "Upgrade for deeper analytics, unlimited history, and pro exports."),
+                h(
+                  "p",
+                  { className: "muted" },
+                  "Upgrade for deeper analytics, unlimited history, and pro exports."
+                ),
               ]),
             ];
           }
@@ -641,7 +910,11 @@
             return [
               h("div", { className: "panel" }, [
                 h("h2", null, "Help"),
-                h("p", { className: "muted" }, "Need support? Reach out or check the quickstart guide."),
+                h(
+                  "p",
+                  { className: "muted" },
+                  "Need support? Reach out or check the quickstart guide."
+                ),
               ]),
             ];
           }
@@ -656,56 +929,69 @@
               onPause: handlePause,
               onReset: handleReset,
             }),
-            h(
-              "div",
-              { className: "panel" },
-              [
-                h("h2", null, "Queue"),
-                h("p", { className: "muted" }, "Next up sessions to jump into quickly."),
-                h(
-                  "div",
-                  { className: "task-items" },
-                  quickQueue.map((task) =>
-                    h(
-                      "div",
-                      {
-                        key: task.id,
-                        className: `task ${task.id === activeTaskId ? "active" : ""}`,
-                        onClick: () => {
-                          handleSelectTask(task.id);
-                          setIsRunning(true);
-                        },
-                        style: { cursor: "pointer" },
+            h("div", { className: "panel" }, [
+              h("h2", null, "Queue"),
+              h(
+                "p",
+                { className: "muted" },
+                "Next up sessions to jump into quickly."
+              ),
+              h(
+                "div",
+                { className: "task-items" },
+                quickQueue.map((task) =>
+                  h(
+                    "div",
+                    {
+                      key: task.id,
+                      className: `task ${
+                        task.id === activeTaskId ? "active" : ""
+                      }`,
+                      onClick: async () => {
+                        await handleSelectTask(task.id);
+                        setIsRunning(true);
                       },
-                      [
-                        h("div", null, [
-                          h("h3", null, task.title),
-                          h("div", { className: "meta" }, [
-                            h("span", {
+                      style: { cursor: "pointer" },
+                    },
+                    [
+                      h("div", null, [
+                        h("h3", null, task.title),
+                        h("div", { className: "meta" }, [
+                          h(
+                            "span",
+                            {
                               className: "tag",
-                              style: { borderColor: task.color, background: `${task.color}22` },
-                            }, task.tag || "Focus"),
-                            h("span", { className: "time-small" }, formatTime(task.seconds || 0)),
-                          ]),
-                        ]),
-                        h(
-                          "button",
-                          {
-                            className: "ghost",
-                            onClick: (event) => {
-                              event.stopPropagation();
-                              handleSelectTask(task.id);
-                              setIsRunning(true);
+                              style: {
+                                borderColor: task.color,
+                                background: `${task.color}22`,
+                              },
                             },
+                            task.tag || "Focus"
+                          ),
+                          h(
+                            "span",
+                            { className: "time-small" },
+                            formatTime(task.seconds || 0)
+                          ),
+                        ]),
+                      ]),
+                      h(
+                        "button",
+                        {
+                          className: "ghost",
+                          onClick: async (event) => {
+                            event.stopPropagation();
+                            await handleSelectTask(task.id);
+                            setIsRunning(true);
                           },
-                          "Focus",
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                        },
+                        "Focus"
+                      ),
+                    ]
+                  )
+                )
+              ),
+            ]),
           ];
         };
 
@@ -729,15 +1015,11 @@
                     className: item.id === activeTab ? "active" : "",
                     onClick: () => {
                       setActiveTab(item.id);
-                      setIsRunning(false);
                     },
                   },
-                  [
-                    h("span", { className: "dot" }),
-                    h("span", null, item.label),
-                  ],
-                ),
-              ),
+                  [h("span", { className: "dot" }), h("span", null, item.label)]
+                )
+              )
             ),
           ]),
           h("div", { className: "content-area" }, [
@@ -749,7 +1031,10 @@
                   h("strong", null, activeTask ? activeTask.title : "None"),
                 ]),
               ]),
-              h("div", { className: "chip" }, ["Focus bank", h("strong", null, `${Math.round(totals.totalSeconds / 60)}m`)]),
+              h("div", { className: "chip" }, [
+                "Focus bank",
+                h("strong", null, `${Math.round(totals.totalSeconds / 60)}m`),
+              ]),
             ]),
             ...renderContent(),
           ]),

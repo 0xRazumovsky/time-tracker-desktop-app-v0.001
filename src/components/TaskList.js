@@ -11,6 +11,7 @@ export default function TaskList({
   formatTime,
   isRunning,
   onEditTask,
+  onDeleteTask,
 }) {
   const [title, setTitle] = useState("");
   const [tag, setTag] = useState("Focus");
@@ -134,6 +135,15 @@ export default function TaskList({
               },
               "Cancel",
             ),
+          h(
+            "button",
+            {
+              className: "ghost",
+              type: "button",
+              onClick: () => onDeleteTask?.(task.id),
+            },
+            "Delete",
+          ),
         ]),
       ],
     );

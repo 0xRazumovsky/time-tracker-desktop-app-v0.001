@@ -1,0 +1,27 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.flowtime.tracker
+productName: Flowtime
+files:
+  - filter:
+      - src/**/*
+      - package.json
+      - node_modules/electron/**/*
+      - node_modules/react/**/*
+      - node_modules/react-dom/**/*
+      - node_modules/sqlite/**/*
+      - node_modules/sqlite3/**/*
+mac:
+  category: public.app-category.productivity
+  icon: 512x512.png
+  target:
+    - dmg
+    - zip
+win:
+  icon: 512x512.png
+  target: nsis
+linux:
+  icon: 512x512.png
+  target: AppImage
+electronVersion: 39.2.3

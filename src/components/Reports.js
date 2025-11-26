@@ -4,6 +4,7 @@ const h = React.createElement;
 
 export default function Reports({
   tasks,
+  sessions = [],
   formatTime,
   activeRange = "7d",
   onRangeChange,
@@ -21,28 +22,50 @@ export default function Reports({
   const summary = useMemo(() => {
     const now = Date.now();
     const rangeDef = ranges.find((r) => r.id === activeRange) || ranges[0];
-    const filtered = tasks.filter((task) => {
-      if (!rangeDef.days) return true;
-      const started = task.startedAt || now;
-      const ageMs = now - started;
-      const limitMs = rangeDef.days * 24 * 60 * 60 * 1000;
-      return ageMs <= limitMs;
+    const limitMs = rangeDef.days ? rangeDef.days * 24 * 60 * 60 * 1000 : null;
+
+    const withinRange = (ts) => {
+      if (!limitMs) return true;
+      const age = now - ts;
+      return age >= 0 && age <= limitMs;
+    };
+
+    const filteredSessions = sessions.filter((session) => {
+      return withinRange(session.day);
     });
 
-    const totalSeconds = filtered.reduce(
-      (sum, task) => sum + (task.seconds || 0),
+    const secondsByTask = tasks.reduce((acc, task) => {
+      const anchor =
+        task.startedAt ||
+        task.started_at ||
+        task.createdAt ||
+        task.created_at ||
+        task.updatedAt ||
+        task.updated_at ||
+        now;
+      if (withinRange(anchor)) {
+        acc[task.id] = (acc[task.id] || 0) + (task.seconds || 0);
+      }
+      return acc;
+    }, {});
+
+    filteredSessions.forEach((entry) => {
+      secondsByTask[entry.taskId] = (secondsByTask[entry.taskId] || 0) + (entry.seconds || 0);
+    });
+
+    const totalSeconds = Object.values(secondsByTask).reduce(
+      (sum, val) => sum + val,
       0
     );
-    const avgSeconds = filtered.length
-      ? Math.round(totalSeconds / filtered.length)
+    const orderedTasks = tasks
+      .map((task) => ({ ...task, rangeSeconds: secondsByTask[task.id] || 0 }))
+      .filter((task) => task.rangeSeconds > 0)
+      .sort((a, b) => (b.rangeSeconds || 0) - (a.rangeSeconds || 0));
+
+    const avgSeconds = orderedTasks.length
+      ? Math.round(totalSeconds / orderedTasks.length)
       : 0;
-    const longest = filtered.reduce(
-      (winner, task) => (task.seconds > (winner?.seconds || 0) ? task : winner),
-      undefined
-    );
-    const orderedTasks = filtered
-      .slice()
-      .sort((a, b) => (b.seconds || 0) - (a.seconds || 0));
+    const longest = orderedTasks[0] || null;
 
     return {
       totalSeconds,
@@ -50,9 +73,9 @@ export default function Reports({
       longest,
       orderedTasks,
       rangeLabel: rangeDef.label,
-      isEmpty: filtered.length === 0,
+      isEmpty: orderedTasks.length === 0,
     };
-  }, [tasks, activeRange]);
+  }, [tasks, sessions, activeRange]);
 
   const stat = (value, label) =>
     h("div", { className: "stat" }, [
@@ -121,7 +144,7 @@ export default function Reports({
                 h(
                   "div",
                   { className: "time-small" },
-                  formatTime(task.seconds || 0)
+                  formatTime(task.rangeSeconds || 0)
                 ),
               ])
             )
