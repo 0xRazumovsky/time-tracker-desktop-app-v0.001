@@ -1,4 +1,11 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } from "electron/main";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Tray,
+  Menu,
+  nativeImage,
+} from "electron/main";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -40,8 +47,14 @@ function updateTrayMenu() {
         },
       },
       { type: "separator" },
-      { label: "Quit", click: () => app.quit() },
-    ]),
+      {
+        label: "Quit",
+        click: () => {
+          tray?.destroy();
+          app.quit();
+        },
+      },
+    ])
   );
 }
 
@@ -129,8 +142,10 @@ app.whenReady().then(() => {
   });
 });
 
+app.on("before-quit", () => {
+  tray?.destroy();
+});
+
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  app.quit();
 });
