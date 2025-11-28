@@ -568,12 +568,13 @@
       ];
 
       const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
         const secs = seconds % 60;
-        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(
-          2,
-          "0"
-        )}`;
+        if (hrs > 0) {
+          return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        }
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
       };
 
       function App() {
@@ -675,8 +676,14 @@
           [tasks, activeTaskId]
         );
 
-        const flushActive = async () => {
-          if (!activeTaskId || pendingRef.current <= 0) return;
+        const flushActive = async (stop = false) => {
+          if (!activeTaskId || pendingRef.current <= 0) {
+            if (stop) {
+              setIsRunning(false);
+              sendTimerState(false);
+            }
+            return;
+          }
           const delta = pendingRef.current;
           pendingRef.current = 0;
           setPendingSeconds(0);
@@ -704,6 +711,10 @@
           } catch (error) {
             console.error("Failed to persist session", error);
           }
+          if (stop) {
+            setIsRunning(false);
+            sendTimerState(false);
+          }
         };
 
         const handleStart = () => {
@@ -718,25 +729,9 @@
           sendTimerState(false);
         };
 
-        const handleReset = async () => {
+        const handleStop = async () => {
           if (!activeTaskId) return;
-          pendingRef.current = 0;
-          setPendingSeconds(0);
-          setTasks((prev) =>
-            prev.map((task) =>
-              task.id === activeTaskId ? { ...task, seconds: 0 } : task
-            )
-          );
-          setSessions((prev) =>
-            prev.filter((session) => session.taskId !== activeTaskId)
-          );
-          setElapsedSeconds(0);
-          setIsRunning(false);
-          try {
-            await window.api?.resetTaskSeconds?.(activeTaskId);
-          } catch (error) {
-            console.error("Failed to reset task", error);
-          }
+          await flushActive(true);
         };
 
         const handleAddTask = async (title, tag, color) => {
@@ -752,9 +747,10 @@
             createdAt: nowTs,
           };
           setTasks((prev) => [...prev, newTask]);
-          setActiveTaskId(newTask.id);
-          setElapsedSeconds(0);
-          setIsRunning(false);
+          if (!activeTaskId) {
+            setActiveTaskId(newTask.id);
+            setElapsedSeconds(0);
+          }
           try {
             await window.api?.saveTask?.(newTask);
           } catch (error) {
@@ -927,7 +923,7 @@
               formatTime,
               onStart: handleStart,
               onPause: handlePause,
-              onReset: handleReset,
+              onStop: handleStop,
             }),
             h("div", { className: "panel" }, [
               h("h2", null, "Queue"),

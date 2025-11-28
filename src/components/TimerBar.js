@@ -9,7 +9,7 @@ export default function TimerBar({
   formatTime,
   onStart,
   onPause,
-  onReset,
+  onStop,
 }) {
   const targetSeconds = 45 * 60;
   const percent = activeTask ? Math.min(100, Math.round((elapsedSeconds / targetSeconds) * 100)) : 0;
@@ -50,10 +50,10 @@ export default function TimerBar({
         "button",
         {
           className: "ghost",
-          onClick: onReset,
+          onClick: onStop,
           disabled: !activeTask,
         },
-        "Reset timer",
+        "Stop timer",
       ),
     ]),
   ]);

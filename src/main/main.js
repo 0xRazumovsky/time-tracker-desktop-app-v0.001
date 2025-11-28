@@ -6,6 +6,7 @@ import {
   Menu,
   nativeImage,
 } from "electron/main";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -25,25 +26,29 @@ let tray;
 let isTimerRunning = false;
 let lastStart = null;
 let activeTaskId = null;
+let mainWindow = null;
 
 function assetPath(filename) {
-  return isPackaged
-    ? path.join(process.resourcesPath, filename)
-    : path.join(__dirname, "..", "..", filename);
+  const candidates = [
+    path.join(process.resourcesPath, filename),
+    path.join(app.getAppPath(), filename),
+    path.join(__dirname, "..", "..", filename),
+  ];
+  const found = candidates.find((p) => fs.existsSync(p));
+  return found || candidates[candidates.length - 1];
 }
 
 function updateTrayMenu() {
   if (!tray) return;
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: "Show", click: () => BrowserWindow.getAllWindows()[0]?.show() },
+      { label: "Show", click: () => (mainWindow || BrowserWindow.getAllWindows()[0])?.show() },
       {
         label: isTimerRunning ? "Pause task" : "Start task",
         click: () => {
-          const win = BrowserWindow.getAllWindows()[0];
-          if (win) {
-            win.webContents.send("tray:toggle-timer");
-          }
+          const win = mainWindow || BrowserWindow.getAllWindows()[0];
+          win?.show();
+          win?.webContents.send("tray:toggle-timer");
         },
       },
       { type: "separator" },
@@ -79,7 +84,15 @@ function createWindow() {
     },
   });
 
+  win.on("close", (event) => {
+    if (!app.isQuiting) {
+      event.preventDefault();
+      win.hide();
+    }
+  });
+
   win.loadFile(path.join(__dirname, "../index.html"));
+  mainWindow = win;
 }
 
 app.whenReady().then(() => {
@@ -147,5 +160,9 @@ app.on("before-quit", () => {
 });
 
 app.on("window-all-closed", () => {
+  if (!app.isQuiting) {
+    // keep app alive for tray
+    return;
+  }
   app.quit();
 });

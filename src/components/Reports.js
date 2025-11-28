@@ -30,11 +30,14 @@ export default function Reports({
       return age >= 0 && age <= limitMs;
     };
 
-    const filteredSessions = sessions.filter((session) => {
-      return withinRange(session.day);
-    });
+    const filteredSessions = sessions.filter((session) => withinRange(session.day));
 
-    const secondsByTask = tasks.reduce((acc, task) => {
+    const secondsByTask = {};
+    filteredSessions.forEach((entry) => {
+      secondsByTask[entry.taskId] = (secondsByTask[entry.taskId] || 0) + (entry.seconds || 0);
+    });
+    // fallback: if no session entries for a task in range, use task.seconds if created in range
+    tasks.forEach((task) => {
       const anchor =
         task.startedAt ||
         task.started_at ||
@@ -43,15 +46,15 @@ export default function Reports({
         task.updatedAt ||
         task.updated_at ||
         now;
-      if (withinRange(anchor)) {
-        acc[task.id] = (acc[task.id] || 0) + (task.seconds || 0);
+      if (withinRange(anchor) && secondsByTask[task.id] === undefined) {
+        secondsByTask[task.id] = task.seconds || 0;
       }
+    });
+
+    const dayTotals = filteredSessions.reduce((acc, entry) => {
+      acc[entry.day] = (acc[entry.day] || 0) + (entry.seconds || 0);
       return acc;
     }, {});
-
-    filteredSessions.forEach((entry) => {
-      secondsByTask[entry.taskId] = (secondsByTask[entry.taskId] || 0) + (entry.seconds || 0);
-    });
 
     const totalSeconds = Object.values(secondsByTask).reduce(
       (sum, val) => sum + val,
@@ -73,6 +76,7 @@ export default function Reports({
       longest,
       orderedTasks,
       rangeLabel: rangeDef.label,
+      dayTotals,
       isEmpty: orderedTasks.length === 0,
     };
   }, [tasks, sessions, activeRange]);
@@ -82,6 +86,13 @@ export default function Reports({
       h("span", { className: "value" }, value),
       h("span", { className: "label" }, label),
     ]);
+
+  const formatDay = (dayTs) => {
+    const d = new Date(dayTs);
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    return `${dd}.${mm}.${d.getFullYear()}`;
+  };
 
   return h("div", { className: "panel reports" }, [
     h(
@@ -148,6 +159,21 @@ export default function Reports({
                 ),
               ])
             )
+          ),
+          h(
+            "div",
+            { className: "report-list" },
+            Object.entries(summary.dayTotals || {})
+              .sort((a, b) => Number(b[0]) - Number(a[0]))
+              .map(([day, secs]) =>
+                h("div", { key: day, className: "report-row" }, [
+                  h("div", null, [
+                    h("div", { className: "title" }, formatDay(Number(day))),
+                    h("div", { className: "tiny" }, "Working hours"),
+                  ]),
+                  h("div", { className: "time-small" }, formatTime(secs || 0)),
+                ])
+              )
           ),
         ]),
   ]);
